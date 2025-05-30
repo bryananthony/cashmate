@@ -8,24 +8,27 @@ struct BudgetView: View {
 
     @StateObject private var viewModel = BudgetViewModel()
     @State private var budgetInput: String = ""
+    @State private var isShowingBudgetModal: Bool = false // Controls modal visibility
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Set Your Budget per Month")
-                .font(.title2)
-                .bold()
-
             HStack {
-                TextField("Enter budget", text: $budgetInput)
-                    .keyboardType(.decimalPad)
-                    .padding(10)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
+                Text("Set Your Budget per Month")
+                    .font(.title2)
+                    .bold()
 
-                Button("Save") {
-                    saveBudget()
+                Spacer()
+
+                // Grey, smaller gear button without circle
+                Button(action: {
+                    isShowingBudgetModal.toggle()  // Show modal when pressed
+                }) {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 20))  // Smaller icon size
+                        .foregroundColor(.gray)  // Grey color for the icon
+                        .padding(8)  // Padding around the icon for better tap area
                 }
-                .padding(.leading, 8)
+                .background(Color.clear)  // No background
             }
 
             HStack {
@@ -40,7 +43,7 @@ struct BudgetView: View {
                 Spacer()
                 Text("Rp. \(Int(viewModel.remainingBudget))")
                     .bold()
-                    .foregroundColor(viewModel.remainingBudget >= 0 ? .green : .red) // Color red if negative
+                    .foregroundColor(viewModel.remainingBudget >= 0 ? .green : .red)  // Color red if negative
             }
 
             ProgressView(value: viewModel.progress)
@@ -65,6 +68,42 @@ struct BudgetView: View {
             if let budget = budgets.first {
                 viewModel.setBudget(budget)
             }
+        }
+        .sheet(isPresented: $isShowingBudgetModal) {
+            // Modal content for adding budget
+            VStack(spacing: 20) {
+                Text("Enter Your Budget")
+                    .font(.title2)
+                    .bold()
+
+                TextField("Enter budget", text: $budgetInput)
+                    .keyboardType(.decimalPad)
+                    .padding(10)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(8)
+
+                HStack {
+                    Button("Cancel") {
+                        // Close the modal when cancel is pressed
+                        isShowingBudgetModal = false
+                    }
+                    .foregroundColor(.red)
+
+                    Spacer()
+
+                    Button("Save") {
+                        saveBudget()
+                        isShowingBudgetModal = false  // Close the modal after saving
+                    }
+                    .foregroundColor(.green)
+                }
+                .padding(.top, 16)
+            }
+            .padding()
+            .frame(maxWidth: 400)
+            .background(Color.white)
+            .cornerRadius(10)
+            .shadow(radius: 20)
         }
     }
 
