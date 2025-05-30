@@ -40,7 +40,7 @@ struct BudgetView: View {
                 Spacer()
                 Text("Rp. \(Int(viewModel.remainingBudget))")
                     .bold()
-                    .foregroundColor(viewModel.remainingBudget >= 0 ? .green : .red)
+                    .foregroundColor(viewModel.remainingBudget >= 0 ? .green : .red) // Color red if negative
             }
 
             ProgressView(value: viewModel.progress)
@@ -71,7 +71,7 @@ struct BudgetView: View {
     private func syncViewModel() {
         // Sync the ViewModel with the latest data
         viewModel.setExpenses(expenses)
-        
+
         // Explicitly reload the latest budget from the context
         if let latestBudget = budgets.first {
             viewModel.setBudget(latestBudget)
