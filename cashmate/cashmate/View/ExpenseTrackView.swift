@@ -30,16 +30,16 @@ struct ExpenseTrackView: View {
     
     private var emptyStateView: some View {
         VStack(spacing: 20) {
-            Text("SELAMAT DATANG!")
+            Text("WELCOME!")
                 .font(.title)
                 .bold()
             
-            Text("Anda belum memiliki transaksi\nSilahkan menambahkan transaksi")
+            Text("You don't have any transactions yet\nPlease add a transaction")
                 .multilineTextAlignment(.center)
                 .foregroundColor(.gray)
             
             Button(action: { showAddExpense = true }) {
-                Label("Tambah Transaksi", systemImage: "plus")
+                Label("Add Transaction", systemImage: "plus")
                     .padding()
                     .background(Color.blue)
                     .foregroundColor(.white)
