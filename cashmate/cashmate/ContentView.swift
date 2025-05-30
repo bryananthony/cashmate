@@ -38,14 +38,14 @@ struct ContentView: View {
                     .foregroundColor(.yellow)
                     .background(Circle().fill(Color.blue).frame(width: 120, height: 120))
                 
-                Text("DOMPETKU")
+                Text("Cashmate")
                     .font(.title2)
                     .fontWeight(.bold)
             }
             .padding(.top, 40)
             
             // Welcome Text
-            Text("SELAMAT DATANG!")
+            Text("WELCOME!")
                 .font(.title2)
                 .fontWeight(.bold)
                 .foregroundColor(.cyan)
@@ -53,8 +53,8 @@ struct ContentView: View {
             
             // Info Text
             VStack(spacing: 4) {
-                Text("Anda belum memiliki transaksi")
-                Text("Silahkan menambahkan transaksi")
+                Text("You don't have any transaction yet")
+                Text("Please Add Transaction")
             }
             .font(.body)
             .padding(.top, 8)
