@@ -34,6 +34,10 @@ struct ContentView: View {
                 .tabItem {
                     Label("Goals", systemImage: "target")
                 }
+             BudgetView()
+                .tabItem {
+                    Label("Budget", systemImage: "creditcard")
+                }
         }
         .onAppear {
             expenseViewModel.setContext(modelContext)
