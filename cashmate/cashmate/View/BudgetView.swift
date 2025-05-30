@@ -53,37 +53,54 @@ struct BudgetView: View {
         .navigationTitle("Budget Tracker")
         .onAppear {
             syncViewModel()
-            if let budget = budgets.first {
-                budgetInput = String(format: "%.0f", budget.amount)
-            }
         }
         .onChange(of: expenses) { _ in
-            viewModel.expenses = expenses
+            viewModel.setExpenses(expenses)
         }
         .onChange(of: budgets) { _ in
             syncViewModel()
         }
+        .onChange(of: budgetInput) { _ in
+            // Sync the budget when the input changes
+            if let budget = budgets.first {
+                viewModel.setBudget(budget)
+            }
+        }
     }
 
     private func syncViewModel() {
-        viewModel.expenses = expenses
-        viewModel.budget = budgets.first
+        // Sync the ViewModel with the latest data
+        viewModel.setExpenses(expenses)
+        
+        // Explicitly reload the latest budget from the context
+        if let latestBudget = budgets.first {
+            viewModel.setBudget(latestBudget)
+        }
+
+        // Set the text field value to the current budget amount
+        if let budget = budgets.first {
+            budgetInput = String(format: "%.0f", budget.amount)
+        }
     }
 
     private func saveBudget() {
         guard let value = Double(budgetInput) else { return }
 
+        // Check if a budget already exists
         if let existing = budgets.first {
             existing.amount = value
-            viewModel.budget = existing
+            viewModel.setBudget(existing)
         } else {
+            // Create a new budget if none exists
             let newBudget = Budget(amount: value)
             context.insert(newBudget)
-            viewModel.budget = newBudget
+            viewModel.setBudget(newBudget)
         }
 
         do {
-            try context.save()
+            try context.save()  // Commit the changes to the context
+            // After saving, we explicitly refresh the data
+            syncViewModel()
         } catch {
             print("Failed to save budget: \(error)")
         }
