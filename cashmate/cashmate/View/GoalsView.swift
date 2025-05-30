@@ -7,6 +7,8 @@ struct GoalsView: View {
     @State private var showSavingForm = false
     @State private var savingAmount: String = ""
     @State private var showHistory = false
+    @State private var showProfile = false
+
     
     var activeGoals: [Goal] {
         goalViewModel.goals.filter { !$0.isCompleted }
@@ -28,6 +30,7 @@ struct GoalsView: View {
     }
     
     var body: some View {
+        
         NavigationStack {
             List {
                 if let currentGoal = goalViewModel.currentGoal() {
@@ -132,6 +135,10 @@ struct GoalsView: View {
                     }
                 }
             }
+            .sheet(isPresented: $showProfile) {
+                ProfileView()
+            }
+
             .sheet(isPresented: $showAddGoal) {
                 AddGoalView(viewModel: goalViewModel)
             }
@@ -171,8 +178,35 @@ struct GoalsView: View {
                             }
                         }
                     }
+                    .navigationTitle("Goals")
                     .navigationTitle("Goals History")
                     .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        // LEFT: Profile button
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button(action: {
+                                showProfile = true
+                            }) {
+                                Image(systemName: "person.crop.circle")
+                            }
+                        }
+                        
+                        // RIGHT: History & Add Goal buttons
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            HStack {
+                                Button(action: { showHistory = true }) {
+                                    Image(systemName: "clock.arrow.circlepath")
+                                }
+                                
+                                Button(action: { showAddGoal = true }) {
+                                    Image(systemName: "plus")
+                                    
+                                    
+                                }
+                            }
+                        }
+                    }
+
                 }
             }
         }
