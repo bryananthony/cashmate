@@ -11,136 +11,95 @@
 // ExpenseTrackingView.swift
 import SwiftUI
 
-struct ExpenseTrackingView: View {
-    @State private var price: String = ""
-    @State private var description: String = ""
-    @State private var showingImagePicker = false
-    @State private var inputImage: UIImage?
-    @State private var showingFileImporter = false
+struct ExpenseTrackView: View {
+    @ObservedObject var viewModel: ExpenseViewModel
+    @State private var showAddExpense = false
     
     var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("Expense Details")) {
-                    // Photo selection
-                    Button(action: {
-                        showingImagePicker = true
-                    }) {
-                        HStack {
-                            Image(systemName: "photo")
-                            Text("Photo")
-                            Spacer()
-                            if inputImage != nil {
-                                Image(uiImage: inputImage!)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 40, height: 40)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                            }
-                        }
+        NavigationStack {
+            Group {
+                if viewModel.expenses.isEmpty {
+                    emptyStateView
+                } else {
+                    expenseListView
+                }
+            }
+            .navigationTitle("Expenses")
+            .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { showAddExpense = true }) {
+                        Image(systemName: "plus")
                     }
+                }
+            }
+            .sheet(isPresented: $showAddExpense) {
+                AddExpenseView(viewModel: viewModel)
+            }
+        }
+    }
+    
+    private var emptyStateView: some View {
+        VStack(spacing: 20) {
+            Text("SELAMAT DATANG!")
+                .font(.title)
+                .bold()
+            
+            Text("Anda belum memiliki transaksi\nSilahkan menambahkan transaksi")
+                .multilineTextAlignment(.center)
+                .foregroundColor(.gray)
+            
+            Button(action: { showAddExpense = true }) {
+                Label("Tambah Transaksi", systemImage: "plus")
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    private var expenseListView: some View {
+        List {
+            ForEach(viewModel.expenses.sorted { $0.date > $1.date }) { expense in
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(expense.desc)
+                        .font(.headline)
                     
-                    // File chooser
-                    Button(action: {
-                        showingFileImporter = true
-                    }) {
-                        HStack {
-                            Image(systemName: "folder")
-                            Text("Choose file")
-                        }
-                    }
-                    
-                    // Price input
                     HStack {
-                        Image(systemName: "dollarsign.circle")
-                        TextField("Price", text: $price)
-                            .keyboardType(.decimalPad)
+                        Text(viewModel.formatCurrency(expense.amount))
+                            .font(.subheadline)
+                        
+                        Spacer()
+                        
+                        Text(expense.date.formatted(date: .abbreviated, time: .omitted))
+                            .font(.caption)
+                            .foregroundColor(.gray)
                     }
                     
-                    // Description - Changed to TextEditor for multi-line input
-                    VStack(alignment: .leading) {
-                        HStack {
-                            Image(systemName: "text.bubble")
-                            Text("Description")
-                        }
-                        TextEditor(text: $description)
-                            .frame(height: 100) // Set height for larger input area
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.gray.opacity(0.5), lineWidth: 1)
-                            )
+                    // Display photo if available
+                    if let photoData = expense.photoData,
+                       let uiImage = UIImage(data: photoData) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxHeight: 150)
+                            .cornerRadius(8)
                             .padding(.top, 4)
                     }
                 }
-                
-                // Submit button
-                Section {
-                    Button(action: submitExpense) {
-                        HStack {
-                            Spacer()
-                            Text("Submit")
-                                .fontWeight(.bold)
-                            Spacer()
-                        }
+                .padding(.vertical, 8)
+                .swipeActions(edge: .trailing) {
+                    Button(role: .destructive) {
+                        viewModel.deleteExpense(expense)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
                     }
                 }
             }
-            .navigationTitle("Expense Tracking")
-            .sheet(isPresented: $showingImagePicker, onDismiss: loadImage) {
-                ImagePicker(image: $inputImage)
-            }
-            .fileImporter(isPresented: $showingFileImporter, allowedContentTypes: [.item]) { result in
-                // Handle file import result here
-            }
         }
-    }
-    
-    func loadImage() {
-        // Handle image loading if needed
-    }
-    
-    func submitExpense() {
-        // Handle expense submission
-        print("Expense submitted - Price: \(price), Description: \(description)")
-    }
-}
-
-// ImagePicker for photo selection
-struct ImagePicker: UIViewControllerRepresentable {
-    @Binding var image: UIImage?
-    @Environment(\.presentationMode) var presentationMode
-    
-    func makeUIViewController(context: Context) -> UIImagePickerController {
-        let picker = UIImagePickerController()
-        picker.delegate = context.coordinator
-        return picker
-    }
-    
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
-    class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-        let parent: ImagePicker
-        
-        init(_ parent: ImagePicker) {
-            self.parent = parent
-        }
-        
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            if let uiImage = info[.originalImage] as? UIImage {
-                parent.image = uiImage
-            }
-            parent.presentationMode.wrappedValue.dismiss()
-        }
-    }
-}
-
-// Preview
-struct ExpenseTrackingView_Previews: PreviewProvider {
-    static var previews: some View {
-        ExpenseTrackingView()
+        .listStyle(.plain)
     }
 }
