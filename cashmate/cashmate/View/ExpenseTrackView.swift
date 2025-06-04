@@ -3,6 +3,9 @@ import SwiftUI
 struct ExpenseTrackView: View {
     @ObservedObject var viewModel: ExpenseViewModel
     @State private var showAddExpense = false
+    @State private var selectedExpense: Expense? = nil
+    @State private var showEditExpense = false
+    
     
     var body: some View {
         NavigationStack {
@@ -24,6 +27,9 @@ struct ExpenseTrackView: View {
             }
             .sheet(isPresented: $showAddExpense) {
                 AddExpenseView(viewModel: viewModel)
+            }
+            .sheet(item: $selectedExpense) { expense in
+                EditExpenseView(viewModel: viewModel, expense: expense)
             }
         }
     }
@@ -54,6 +60,10 @@ struct ExpenseTrackView: View {
         List {
             ForEach(viewModel.expenses) { expense in
                 ExpenseCard(expense: expense, viewModel: viewModel)
+                    .contentShape(Rectangle()) // agar seluruh area card bisa ditap
+                    .onTapGesture {
+                        selectedExpense = expense
+                    }
                     .swipeActions(edge: .trailing) {
                         Button(role: .destructive) {
                             viewModel.deleteExpense(expense)

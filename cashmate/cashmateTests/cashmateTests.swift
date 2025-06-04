@@ -150,9 +150,10 @@ final class CashmateTests: XCTestCase {
         XCTAssertEqual(budget.monthlyBudget, 5_000_000) // Default budget
     }
     
-    func testUpdateBudget() async throws {
+    func testUpdateBudget() throws {
         let viewModel = ExpenseViewModel()
         viewModel.setContext(modelContext)
+        viewModel.loadInitialData()
         
         let newBudgetAmount = 3_000_000.0
         viewModel.updateBudget(newBudgetAmount)
@@ -160,6 +161,7 @@ final class CashmateTests: XCTestCase {
         let updatedBudget = viewModel.getCurrentBudget()
         XCTAssertEqual(updatedBudget.monthlyBudget, newBudgetAmount)
     }
+
     
     // MARK: - GoalViewModel Tests
     

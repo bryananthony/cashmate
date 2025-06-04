@@ -1,10 +1,3 @@
-//
-//  ExpenseHistoryView.swift
-//  cashmate
-//
-//  Updated with card design and large title
-//
-
 import SwiftUI
 
 struct ExpenseHistoryView: View {
@@ -41,23 +34,22 @@ struct ExpenseHistoryView: View {
     
     private func getCardColor(for amount: Double) -> Color {
         let budget = viewModel.getCurrentBudget().monthlyBudget
+        guard budget > 0 else { return .gray }
+
         let percentage = amount / budget
-        
-        if percentage >= 2.0 {
-            return Color.red
-        } else if percentage >= 1.5 {
-            return Color.orange
-        } else if percentage >= 1.0 {
-            return Color.yellow
+
+        if percentage >= 1.0 {
+            return .red
         } else if percentage >= 0.5 {
-            return Color.green
+            return .orange
+        } else if percentage >= 0.25 {
+            return .yellow
         } else {
-            return Color.gray
+            return .green
         }
     }
-    
-    // Extracted sorted years as computed property
-    private var sortedYears: [String] {
+
+        private var sortedYears: [String] {
         yearGroupedExpenses.keys.sorted().reversed()
     }
     
@@ -119,7 +111,6 @@ struct ExpenseHistoryView: View {
         }
     }
     
-    // Extracted month card to separate view
     @ViewBuilder
     private func monthCardView(year: String, month: String) -> some View {
         let monthsData = yearGroupedExpenses[year] ?? [:]
@@ -127,7 +118,6 @@ struct ExpenseHistoryView: View {
         let total = monthlyTotal(for: expenses)
         
         Button(action: {
-            // Action for tapping card - could show detail view
         }) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
@@ -152,7 +142,6 @@ struct ExpenseHistoryView: View {
         .buttonStyle(PlainButtonStyle())
     }
     
-    // Helper function to format currency
     private func formatCurrency(_ amount: Double) -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
