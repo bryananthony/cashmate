@@ -64,13 +64,14 @@ class ExpenseViewModel: ObservableObject {
         guard let context = modelContext else {
             return BudgetSetting(monthlyBudget: 0)
         }
-
+        
         if let existing = budgetSettings.first {
             return existing
         } else {
             let newBudget = BudgetSetting(monthlyBudget: 5_000_000)
             context.insert(newBudget)
             try? context.save()
+            budgetSettings = [newBudget] 
             return newBudget
         }
     }
@@ -90,5 +91,17 @@ class ExpenseViewModel: ObservableObject {
 
     private func has2024Data() -> Bool {
         expenses.contains { Calendar.current.component(.year, from: $0.date) == 2024 }
+    }
+    func saveContext() {
+        guard let context = modelContext else { return }
+        try? context.save()
+    }
+
+    func updateExpense(_ expense: Expense, desc: String, amount: Double, photoData: Data?) {
+        expense.desc = desc
+        expense.amount = amount
+        expense.photoData = photoData
+        saveContext()
+        loadInitialData()
     }
 }
