@@ -13,7 +13,7 @@ struct BudgetView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Set Your Budget per Month")
+                Text("Set Your Income per Month")
                     .font(.title2)
                     .bold()
 
@@ -39,7 +39,7 @@ struct BudgetView: View {
             }
 
             HStack {
-                Text("Remaining Budget:")
+                Text("Remaining Expenses:")
                 Spacer()
                 Text("Rp. \(Int(viewModel.remainingBudget))")
                     .bold()
@@ -53,7 +53,7 @@ struct BudgetView: View {
             Spacer()
         }
         .padding()
-        .navigationTitle("Budget Tracker")
+        .navigationTitle("Budget Income")
         .onAppear {
             syncViewModel()
         }
@@ -72,11 +72,11 @@ struct BudgetView: View {
         .sheet(isPresented: $isShowingBudgetModal) {
             // Modal content for adding budget
             VStack(spacing: 20) {
-                Text("Enter Your Budget")
+                Text("Enter Your Income")
                     .font(.title2)
                     .bold()
 
-                TextField("Enter budget", text: $budgetInput)
+                TextField("Enter Income", text: $budgetInput)
                     .keyboardType(.decimalPad)
                     .padding(10)
                     .background(Color(.systemGray6))

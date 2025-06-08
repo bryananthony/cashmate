@@ -1,10 +1,3 @@
-//
-//  ContentView.swift
-//  cashmate
-//
-//  Created by student on 30/05/25.
-//
-
 import SwiftUI
 import SwiftData
 
@@ -36,7 +29,7 @@ struct ContentView: View {
                 }
              BudgetView()
                 .tabItem {
-                    Label("Budget", systemImage: "creditcard")
+                    Label("Income", systemImage: "creditcard")
                 }
         }
         .onAppear {
